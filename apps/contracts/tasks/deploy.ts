@@ -2,30 +2,23 @@ import { task, types } from "hardhat/config"
 
 task("deploy", "Deploy a Feedback contract")
     .addOptionalParam("semaphore", "Semaphore contract address", undefined, types.string)
-    .addOptionalParam("group", "Group id", "42", types.string)
-    .addOptionalParam("logs", "Print the logs", true, types.boolean)
-    .setAction(async ({ logs, semaphore: semaphoreAddress, group: groupId }, { ethers, run }) => {
+    .setAction(async ({semaphore: semaphoreAddress }, { ethers, run }) => {
+        // 옵티미즘 testnet :  "0x3889927F0B5Eb1a02C6E2C20b39a1Bd4EAd76131"
         if (!semaphoreAddress) {
             const { semaphore } = await run("deploy:semaphore", {
-                logs
+                
             })
 
             semaphoreAddress = semaphore.address
         }
 
-        if (!groupId) {
-            groupId = process.env.GROUP_ID
-        }
+        const HackathonFactoryFactory = await ethers.getContractFactory("HackathonFactory")
 
-        const FeedbackFactory = await ethers.getContractFactory("Feedback")
+        const HackathonFactoryContract = await HackathonFactoryFactory.deploy(semaphoreAddress)
 
-        const feedbackContract = await FeedbackFactory.deploy(semaphoreAddress, groupId)
+        await HackathonFactoryContract.deployed()
 
-        await feedbackContract.deployed()
+        console.info(`HackathonFactory contract has been deployed to: ${HackathonFactoryContract.address}`)
 
-        if (logs) {
-            console.info(`Feedback contract has been deployed to: ${feedbackContract.address}`)
-        }
-
-        return feedbackContract
+        return HackathonFactoryContract
     })
