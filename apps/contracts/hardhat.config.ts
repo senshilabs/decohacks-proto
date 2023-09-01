@@ -17,11 +17,6 @@ dotenvConfig({ path: resolve(__dirname, "../../.env") })
 function getNetworks(): NetworksUserConfig {
     // if (!process.env.INFURA_API_KEY || !process.env.ETHEREUM_PRIVATE_KEY) {
     //     return {}
-    // }
-
-    console.log(process.env.ETHEREUM_PRIVATE_KEY)
-    console.log(process.env.DEFAULT_NETWORK)
-    console.log(process.env.ETHERSCAN_API_KEY)
 
     const accounts = [`0x${process.env.ETHEREUM_PRIVATE_KEY}`]
     const infuraApiKey = process.env.INFURA_API_KEY
@@ -46,6 +41,16 @@ function getNetworks(): NetworksUserConfig {
             url: 'https://goerli.optimism.io',
             //url: `https://optimism-goerli.infura.io/v3/${infuraApiKey}`,
             chainId: 420,
+            accounts
+        },
+        "linea-goerli": {
+            url: 'https://rpc.goerli.linea.build',
+            chainId: 59140,
+            accounts
+        },
+        "zksync-goerli": {
+            url: 'https://testnet.era.zksync.dev',
+            chainId: 280,
             accounts
         },
         "arbitrum-goerli": {
