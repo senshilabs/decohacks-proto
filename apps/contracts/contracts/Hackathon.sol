@@ -15,7 +15,7 @@ contract Hackathon {
         uint256 balance;
     }
     
-    struct Hackathon {
+    struct HackathonInfo {
         string name;
         uint256 start;
         uint256 submit_deadline;
@@ -27,7 +27,7 @@ contract Hackathon {
     }
 
     SemaphoreConfig public semaphoreConfig;
-    Hackathon public hackathon;
+    HackathonInfo public hackathon;
     Prize[] public prizes;
     bool public isPrizeDistributed;
 
