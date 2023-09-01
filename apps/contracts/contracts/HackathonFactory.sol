@@ -12,9 +12,7 @@ contract HackathonFactory {
         semaphore = ISemaphore(semaphoreAddress);
     }
 
-    // payable
     function createMiniHackathon(
-        address semaphoreAddress,
         string memory _name, 
         uint256 _start,
         uint256 _submit_deadline, 
@@ -23,9 +21,9 @@ contract HackathonFactory {
         string memory _telegram,
         string memory _twitter,
         address[] memory _evaluators
-    ) public payable returns(address){
+    ) public returns(address){
         Hackathon hackathon = new Hackathon(
-            semaphoreAddress,
+            address(semaphore),
             _name,
             _start,
             _submit_deadline,
