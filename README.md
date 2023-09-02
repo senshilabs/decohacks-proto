@@ -43,7 +43,7 @@ DECOHACKS (Decentralization Of HACKathonS)
 
 ### Technologies Used
 - Blockchain: Ethereum
-- Programming Language: Solidity
+- Programming Language: Solidity, TS
 - Layer 2: Optimism, Linea
 - zk-Solutions: Semaphore
 
@@ -51,6 +51,26 @@ DECOHACKS (Decentralization Of HACKathonS)
 - [GitHub Repository](https://github.com/senshilabs/decohacks-proto)
 
 
+## Project Detail 
+
+### Contract
+1. **Certificate.sol**: This contract facilitates the issuance of certification tokens following the ERC1155 token standard. Its key functionalities are as follows:
+   - `addIssuer(address issuer)`: A function to register certificate issuers, restricting issuance rights to these designated addresses.
+   - `issueAwardCertificate(address account, uint256 hackathon)`: A function to issue award certificates, creating tokens and awarding them to recipient accounts.
+   - `issueParticipateCertificate(address account, uint256 hackathon)`: A function to issue participation certificates, creating tokens and awarding them to participant accounts.
+
+2. **Hackathon.sol**: This contract manages hackathon information and operations. Its key functionalities include:
+   - `participate()`: A function for participants to join the hackathon. It registers participant information before the hackathon starts and issues participation certificates.
+   - `depositEthPrize(string memory prizeName)`: A function for depositing prize funds. It records prize information and deposits ether into the contract.
+   - `addVoter(uint256 identityCommitment)`: A function to add voter to the semaphore group, ensuring only evaluators can participate.
+   - `castVote(uint256 voted, uint256 merkleTreeRoot, uint256 nullifierHash, uint256[8] calldata proof)`: A function allowing evaluators to cast votes using the Semaphore protocol, verifying the proof.
+   - `distributePrize()`: A function to distribute prizes based on voting results. It distributes ether to participants as prizes and transfers remaining balances to the contract owner.
+
+3. **HackathonFactory.sol**: This contract creates and manages hackathon contracts. Its main functionalities are as follows:
+   - `createMiniHackathon(...)`: A function to create hackathon contracts. It sets up a hackathon using the Semaphore protocol and the Certificate contract, and registers it.
+
+### ZKP
+![image](https://github.com/senshilabs/decohacks-proto/assets/10369528/f8c94137-1c7b-4946-b727-5a7b09926275)
 
 ### Main Contract 
 
