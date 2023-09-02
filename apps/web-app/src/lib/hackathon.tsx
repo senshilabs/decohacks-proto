@@ -1,11 +1,10 @@
-import { readContract, readContracts, writeContract } from "@wagmi/core"
+import { SemaphoreEthers } from "@semaphore-protocol/data"
 import { Group } from "@semaphore-protocol/group"
 import { Identity } from "@semaphore-protocol/identity"
-import { SemaphoreSubgraph } from "@semaphore-protocol/data"
-import { SemaphoreEthers } from "@semaphore-protocol/data"
 import { generateProof } from "@semaphore-protocol/proof"
+import { readContract, readContracts, writeContract } from "@wagmi/core"
 import { BigNumber, ethers, utils } from "ethers"
-import { parseEther } from "viem"
+import { Chain, parseEther } from "viem"
 import hackathon from "../../contract-artifacts/Hackathon.json"
 
 const ABI = hackathon.abi
@@ -60,6 +59,15 @@ export const getJudges = (contractAddress: "0x${String}") => readContract(
     }
 )
 
+export const getVote = (contractAddress: "0x${String}") => (userAddress : string) => readContract(
+    {
+        address: contractAddress,
+        abi: ABI,
+        functionName: "votes",
+        args: [userAddress]
+    }
+)
+
 export const hackathonInfo = (contractAddress: "0x${String}") => readContracts({
         contracts: [
             {
@@ -98,18 +106,23 @@ export const addVoter = (contractAddress: "0x${String}") => (identityCommitment:
     )
 
 
-export const castVote = (chainId:number, contractAddress: "0x${String}", _identity: Identity) => async (vote: string) => {
-
+export const castVote = (chain:Chain, contractAddress: "0x${String}", _identity: Identity) => async (vote: string) => {
+    let semaphoreAddress;
+    if (chain.id === 420) {
+        semaphoreAddress = "0x3889927F0B5Eb1a02C6E2C20b39a1Bd4EAd76131"
+    } else if (chain.id === 59140) {
+        semaphoreAddress = "0x31E4CA436707166315734Ed62f59a36Cc1132483"
+    }
     // 이거 chain 에 맞게 설정
-    const semaphoreEthers = new SemaphoreEthers("http://localhost:8545", {
-    address: "semaphore-address"
+    // console.log("rpcUrl ", chain.rpcUrls.public.http[0])
+    const semaphoreEthers = new SemaphoreEthers("https://opt-goerli.g.alchemy.com/v2/demo", {
+        address: semaphoreAddress
     })
 
     const members = await semaphoreEthers.getGroupMembers(contractAddress)
     const group = new Group(contractAddress, 20, members)
-
     const signal = BigNumber.from(utils.formatBytes32String(vote)).toString()
-
+    
     const { proof, merkleTreeRoot, nullifierHash } = await generateProof(
         _identity,
         group,
@@ -117,11 +130,11 @@ export const castVote = (chainId:number, contractAddress: "0x${String}", _identi
         signal
     )
 
-    return fetch("api/vote", {
+    return fetch("/api/vote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            chainId,
+            chainId: chain.id,
             contractAddress,
             vote,
             merkleTreeRoot,

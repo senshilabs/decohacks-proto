@@ -5,6 +5,8 @@ import Hackathon from "../../../contract-artifacts/Hackathon.json"
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { chainId, contractAddress, vote, merkleTreeRoot, nullifierHash, proof } = req.body
 
+    console.log({ chainId, contractAddress, vote, merkleTreeRoot, nullifierHash, proof })
+
     // number -> string
     const rpc : {[key: number]: string} = {
     420 : 'https://goerli.optimism.io',
@@ -22,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     
     try {
-        const transaction = await contract.sendFeedback(vote, merkleTreeRoot, nullifierHash, proof)
+        const transaction = await contract.castVote(vote, merkleTreeRoot, nullifierHash, proof)
         await transaction.wait()
 
         res.status(200).end()

@@ -1,12 +1,13 @@
 import { faker } from '@faker-js/faker'
 import { EnvelopeIcon, PhoneIcon } from '@heroicons/react/20/solid'
 import { Identity } from '@semaphore-protocol/identity'
+import { publicProvider } from '@wagmi/core/providers/public'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { formatEther } from 'viem'
-import { useContractRead } from 'wagmi'
+import { useAccount, useContractRead, useNetwork } from 'wagmi'
 import hackathonABI from "../../../../contract-artifacts/Hackathon.json"
-import { addVoter, depositEthPrize, getJudges, getParticipants, getPrizes, hackathonInfo, participate } from '../../../lib/hackathon'
+import { addVoter, castVote, depositEthPrize, getJudges, getParticipants, getPrizes, getVote, hackathonInfo, participate } from '../../../lib/hackathon'
 
 const SubTabs = ['info', 'prize', 'judge', 'participant']
 
@@ -33,6 +34,10 @@ function HackathonTab() {
     functionName: "hackathon"
   })
 
+  const { address, isConnecting, isDisconnected } = useAccount()
+  const {chain, chains} = useNetwork()
+  const provider = publicProvider()
+
   const [participants, setParticipants] = useState<string[]>([]);
   const [info, setInfo] = useState<any[]>([]);
   const [prizes, setPrizes] = useState<any[]>([]);
@@ -42,6 +47,10 @@ function HackathonTab() {
   const [ethValue, setEthValue] = useState('');
 
   const [_identity, setIdentity] = useState<Identity>()
+
+  const [voteList, setVoteList] = useState<string[]>([])
+
+  const [selectedId, setSelectedId] = useState<number>(0)
 
   const fecthData = async () => {
     const fetchedParticipants = await getParticipants(contractAddress);
@@ -65,21 +74,38 @@ function HackathonTab() {
     }
   };
 
-  const createIdentity = useCallback(async () => {
-    const identity = new Identity()
-
-    setIdentity(identity)
-
-    localStorage.setItem("identity", identity.toString())
-}, [])
-
-
   useEffect(()=>{
-    if(_identity?.commitment) {
-      addVoter(contractAddress)(_identity?.commitment.toString())
+    const temp = async () => {
+      try{
+        setTimeout(async()=>{
+          const result = await getVote(contractAddress)(address)
+          console.log({result})
+        }, 1000)
+      
+      }catch(e){
+        console.log(e)
+      }
+      
     }
     
-  },[_identity])
+    temp()
+  },[])
+
+  const createIdentity = async () => {
+    const identity = new Identity()
+    setIdentity(identity)
+    localStorage.setItem("identity", identity.toString())
+    
+    if(_identity) {
+      try{
+        addVoter(contractAddress)(_identity?.commitment.toString()).then((res)=>{
+          castVote(chain, contractAddress, _identity)(selectedId.toString())
+        })
+      }catch(e){
+        console.log(e)
+      }
+    }
+  }
 
   useEffect(()=>{
     fecthData()
@@ -265,11 +291,6 @@ function HackathonTab() {
       break
     case 'judge':
       content = (
-        // <div id="judge">
-        //   {info?.judgeList.map((judge, i) => (
-        //     <p>{judge}</p>
-        //   ))}
-        // </div>
         <ul
           role="list"
           className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
@@ -338,12 +359,15 @@ function HackathonTab() {
     case 'participant':
       content = (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {participants.length ? participants.map((participant) => (
-            <div>
+          {participants.length ? participants.map((participant, i) => (
+            <div key={i}>
                 <div
               key={faker.internet.email()}
               className="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm cursor-pointer"
-              onClick={createIdentity}
+              onClick={()=>{
+                setSelectedId(i)
+                createIdentity()
+              }}
             >
               <div className="flex-shrink-0">
                 <img
