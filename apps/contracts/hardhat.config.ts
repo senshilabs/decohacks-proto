@@ -90,7 +90,18 @@ const hardhatConfig: HardhatUserConfig = {
         target: "ethers-v5"
     },
     etherscan: {
-        apiKey: process.env.ETHERSCAN_API_KEY
+        apiKey: process.env.ETHERSCAN_API_KEY,
+        
+    customChains: [
+        {
+          network: "linea-goerli",
+          chainId: 59140,
+          urls: {
+            apiURL: "https://api-testnet.lineascan.build/api",
+            browserURL: "https://goerli.lineascan.build/address"
+          }
+        }
+      ]
     }
 }
 
