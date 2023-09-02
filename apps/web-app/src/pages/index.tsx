@@ -38,13 +38,14 @@ export default function Home() {
     const [deployedHacakthons, setDeployedHackathons] = useState<string[]>([]);
 
     useEffect(()=>{
-        if(chain.id === 420) {
-          setTargetHackathonFactory(HackathonFactoryAddress.optimism)
+        if(chain){
+            if(chain.id === 420) {
+                setTargetHackathonFactory(HackathonFactoryAddress.optimism)
+              }
+              if(chain.id === 59140){
+                setTargetHackathonFactory(HackathonFactoryAddress.linea)
+              }      
         }
-        if(chain.id === 59140){
-          setTargetHackathonFactory(HackathonFactoryAddress.linea)
-        }
-        
       },[chain])
 
     useEffect(()=>{

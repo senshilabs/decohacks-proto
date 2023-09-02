@@ -75,13 +75,14 @@ export default function CreateHackathon() {
 
 
   useEffect(()=>{
-    if(chain.id === 420) {
-      setTargetHackathonFactory(HackathonFactoryAddress.optimism)
+    if(chain){
+      if(chain.id === 420) {
+        setTargetHackathonFactory(HackathonFactoryAddress.optimism)
+      }
+      if(chain.id === 59140){
+        setTargetHackathonFactory(HackathonFactoryAddress.linea)
+      }
     }
-    if(chain.id === 59140){
-      setTargetHackathonFactory(HackathonFactoryAddress.linea)
-    }
-    
   },[chain])
   // useEffect(() => {
   //   console.log({name, startTime, endTime, website, telegram, twitter,judge})
