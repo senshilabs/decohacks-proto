@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import { useContractRead, useNetwork } from "wagmi"
 import hackathonABI from "../../contract-artifacts/Hackathon.json"
 import hackathonFactoryABI from "../../contract-artifacts/HackathonFactory.json"
+import { HackathonFactoryAddress } from "../global/constants"
 import { unixTimeStringToDateString } from "../global/util/util"
 
 export const getCurrentStatus = (realHackathonInfo: any[]): string => {
@@ -31,7 +32,7 @@ export const getCurrentStatus = (realHackathonInfo: any[]): string => {
 export default function Home() {
     const { chain, chains } = useNetwork()
     const { data: deployedHacakthons } = useContractRead({
-        address: "0x508a631cEC4F2ecD570D66031De93ad986dCF389",
+        address: HackathonFactoryAddress.optimism,
         abi: hackathonFactoryABI.abi,
         functionName: "getDeployedHackathons"
     })
@@ -79,7 +80,7 @@ export default function Home() {
             <div className="mt-[16px] flex w-full">
                 <div className="grid w-full grid-cols-2 gap-4">
                     {realHackathonInfos?.reverse().map((hackathon, i) => (
-                        <div>
+                        <div key={i}>
                             <div className="rounded-lg bg-gray-50 shadow-sm ring-1 ring-gray-900/5">
                                 <dl className="flex flex-wrap">
                                     <div className="flex-auto pl-6 pt-6">

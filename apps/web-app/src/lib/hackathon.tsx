@@ -1,6 +1,7 @@
 import { readContract, readContracts, writeContract } from "@wagmi/core"
 
 import { ethers } from "ethers"
+import { parseEther } from "viem"
 import hackathon from "../../contract-artifacts/Hackathon.json"
 
 const ABI = hackathon.abi
@@ -47,6 +48,14 @@ export const  getPrizes = async(contractAddress: "0x${String}") => {
     return result
 }
 
+export const getJudges = (contractAddress: "0x${String}") => readContract(
+    {
+        address: contractAddress,
+        abi: ABI,
+        functionName: "getEvaluators"
+    }
+)
+
 export const hackathonInfo = (contractAddress: "0x${String}") => readContracts({
         contracts: [
             {
@@ -64,17 +73,18 @@ export const hackathonInfo = (contractAddress: "0x${String}") => readContracts({
 
 
 
-export const depositEthPrize = (contractAddress: "0x${String}") => (prizeName: String) => writeContract(
+export const depositEthPrize = (contractAddress: "0x${String}") => (prizeName: string, ethValue: string) => writeContract(
         {
             address: contractAddress,
             abi: ABI,
             functionName: "depositEthPrize",
-            args: [prizeName]
+            args: [prizeName],
+            value: parseEther(ethValue)
         }
     )
 
 
-export const addVoter = (contractAddress: "0x${String}") => (identityCommitment: String) => writeContract(
+export const addVoter = (contractAddress: "0x${String}") => (identityCommitment: string) => writeContract(
         {
             address: contractAddress,
             abi: ABI,

@@ -115,3 +115,8 @@ export const hackathonInfos: Hackathon[] = [
         participantList: ["Oliver Clark", "Sophia Brown"]
     }
 ]
+
+export const HackathonFactoryAddress = {
+    "optimism":"0xdef88dBF467A98c1Ea1AA87b22B2Bc9e98d1a79C",
+    "linea":"0xff9a39379F660AFC563e3749aCaadCbf76F3fC32",
+}

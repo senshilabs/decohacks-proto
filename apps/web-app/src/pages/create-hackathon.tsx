@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
+import { HackathonFactoryAddress } from '../global/constants';
 import { createMiniHackathon } from '../lib/hackathonFactory';
 
 export default function CreateHackathon() {
@@ -14,15 +15,8 @@ export default function CreateHackathon() {
 
   const { connector: activeConnector, isConnected } = useAccount()
 
-  // const submit = () => {
-  //   console.log(submit)
-  // }
-
-
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-
-    console.log({name, value})
 
     switch (name) {
       case 'name':
@@ -77,8 +71,7 @@ export default function CreateHackathon() {
   // },[name, startTime, endTime, website, telegram, twitter,judge])
 
   const submit = async () => {
-    console.log({name, startTimestamp, deadlineTimestamp, deadlineTimestamp, website, telegram, twitter,judge})
-    const createHackathon = createMiniHackathon("0x508a631cEC4F2ecD570D66031De93ad986dCF389")
+    const createHackathon = createMiniHackathon(HackathonFactoryAddress.optimism)
     createHackathon(name, startTimestamp, deadlineTimestamp, endTimestamp, website, telegram, twitter, [judge])  
   }
 

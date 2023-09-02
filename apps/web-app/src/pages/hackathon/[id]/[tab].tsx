@@ -2,9 +2,10 @@ import { faker } from '@faker-js/faker'
 import { EnvelopeIcon, PhoneIcon } from '@heroicons/react/20/solid'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { formatEther } from 'viem'
 import { useContractRead } from 'wagmi'
 import hackathonABI from "../../../../contract-artifacts/Hackathon.json"
-import { getParticipants, getPrizes, hackathonInfo, participate } from '../../../lib/hackathon'
+import { depositEthPrize, getJudges, getParticipants, getPrizes, hackathonInfo, participate } from '../../../lib/hackathon'
 
 const SubTabs = ['info', 'prize', 'judge', 'participant']
 
@@ -32,18 +33,31 @@ function HackathonTab() {
   const [participants, setParticipants] = useState<string[]>([]);
   const [info, setInfo] = useState<any[]>([]);
   const [prizes, setPrizes] = useState<any[]>([]);
+  const [judges, setJudges] = useState<any[]>([]);
 
-
-  // const hackathonInfo = useMemo(() => hackathonInfos.find((_, i) => i === Number(router.query.id)), [router])
+  const [prizeName, setPrizeName] = useState('');
+  const [ethValue, setEthValue] = useState('');
 
   const fecthData = async () => {
     const fetchedParticipants = await getParticipants(contractAddress);
     const fetchedInfo = await hackathonInfo(contractAddress);
     const fetchedPrizes = await getPrizes(contractAddress);
+    const fetchJudges = await getJudges(contractAddress);
 
     setParticipants(fetchedParticipants);
     setInfo(fetchedInfo);
-    setPrizes(fetchedPrizes)
+    setPrizes(fetchedPrizes);
+    setJudges(fetchJudges);
+  };
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    if (name === 'prizeName') {
+      setPrizeName(value);
+    } else if (name === 'ethValue') {
+      setEthValue(value);
+    }
   };
 
   useEffect(()=>{
@@ -51,8 +65,8 @@ function HackathonTab() {
   },[deployedHacakthons])
 
   useEffect(()=>{
-    console.log(participants, info, prizes)
-  },[participants, info,prizes])
+    console.log({participants, judges, info, prizes})
+  },[participants, judges, info, prizes])
 
 
 
@@ -177,95 +191,60 @@ function HackathonTab() {
           role="list"
           className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8"
         >
-          {prizes?.map((prize, i) => (
+          <div className='flex justify-center'>
+              <input
+                    type="text"
+                    name="prizeName"
+                    id="prizeName"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mr-4"
+                    placeholder="Prize Name"
+                    onChange={handleChange}
+                  />
+              <input
+                    type="text"
+                    name="ethValue"
+                    id="ethValue"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mr-4"
+                    placeholder="Eth Value"
+                    onChange={handleChange}
+                  />
+              <button
+                type="button"
+                className="rounded bg-white px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                onClick={async()=>{
+                  await depositEthPrize(contractAddress)(prizeName, ethValue)}}
+              >
+                Add Prize
+              </button>
+            </div>
+          {prizes.length ? prizes?.map((prize, i) => (
             <li
               key={i}
               className="overflow-hidden rounded-xl border border-gray-200 bg-white"
             >
               <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
-                <img
-                  src={faker.image.url()}
-                  alt={prize.trackName}
-                  className="h-12 w-12 flex-none rounded-lg bg-white object-cover ring-1 ring-gray-900/10"
-                />
                 <div className="text-sm font-medium leading-6 text-gray-900">
-                  {prize.trackName}
+                  {prize[0]}
                 </div>
-                {/* <Menu as="div" className="relative ml-auto">
-                  <Menu.Button className="-m-2.5 block p-2.5 text-gray-400 hover:text-gray-500">
-                    <span className="sr-only">Open options</span>
-                    <EllipsisHorizontalIcon
-                      className="h-5 w-5"
-                      aria-hidden="true"
-                    />
-                  </Menu.Button>
-                  <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-100"
-                    enterFrom="transform opacity-0 scale-95"
-                    enterTo="transform opacity-100 scale-100"
-                    leave="transition ease-in duration-75"
-                    leaveFrom="transform opacity-100 scale-100"
-                    leaveTo="transform opacity-0 scale-95"
-                  >
-                    <Menu.Items className="absolute right-0 z-10 mt-0.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            href="#"
-                            className={classNames(
-                              active ? 'bg-gray-50' : '',
-                              'block px-3 py-1 text-sm leading-6 text-gray-900'
-                            )}
-                          >
-                            View<span className="sr-only">, {client.name}</span>
-                          </a>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            href="#"
-                            className={classNames(
-                              active ? 'bg-gray-50' : '',
-                              'block px-3 py-1 text-sm leading-6 text-gray-900'
-                            )}
-                          >
-                            Edit<span className="sr-only">, {client.name}</span>
-                          </a>
-                        )}
-                      </Menu.Item>
-                    </Menu.Items>
-                  </Transition>
-                </Menu> */}
               </div>
               <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
                 <div className="flex justify-between gap-x-4 py-3">
-                  <dt className="text-gray-500">Last invoice</dt>
+                  <dt className="text-gray-500">Transaction</dt>
                   <dd className="text-gray-700">
-                    <time dateTime={faker.date.anytime().toString()}>
-                      {faker.date.anytime().toString()}
-                    </time>
+                      {faker.datatype.hexadecimal({length:64})}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-x-4">
                   <dt className="text-gray-500">Amount</dt>
                   <dd className="flex items-start gap-x-2">
                     <div className="font-medium text-gray-900">
-                      {prize.prizeAmount}
-                    </div>
-                    <div
-                      className={
-                        'rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset'
-                      }
-                    >
-                      {'status'}
+                      {formatEther(prize[1])} ETH
                     </div>
                   </dd>
                 </div>
               </dl>
             </li>
-          ))}
+          )) : <></>}
         </ul>
       )
       break
@@ -280,7 +259,7 @@ function HackathonTab() {
           role="list"
           className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
         >
-          {info?.judgeList.map((judge) => (
+          {judges.length ?judges.map((judge) => (
             <li
               key={faker.internet.email()}
               className="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center shadow"
@@ -336,7 +315,7 @@ function HackathonTab() {
                 </div>
               </div>
             </li>
-          ))}
+          )) : <div>no judges</div>}
         </ul>
       )
       break
@@ -344,7 +323,7 @@ function HackathonTab() {
     case 'participant':
       content = (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {participants.map((participant) => (
+          {participants.length ? participants.map((participant) => (
             <div
               key={faker.internet.email()}
               className="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400"
@@ -368,7 +347,7 @@ function HackathonTab() {
                 </a>
               </div>
             </div>
-          ))}
+          )) : <div>no participants</div>}
         </div>
       )
       break
