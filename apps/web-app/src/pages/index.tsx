@@ -13,10 +13,9 @@ import { hackathons } from "../lib/hackathonFactory"
 export const getCurrentStatus = (realHackathonInfo: any[]): string => {
     const now = Date.now() / 1000; 
 
-    
     const startTime = realHackathonInfo[0]?.result[1].toString()
-    const endTime = realHackathonInfo[0]?.result[2].toString()
-    const submissionDeadline = realHackathonInfo[0]?.result[3].toString()
+    const submissionDeadline = realHackathonInfo[0]?.result[2].toString()
+    const endTime = realHackathonInfo[0]?.result[3].toString()
 
     if (now < startTime) {
         return "Register";

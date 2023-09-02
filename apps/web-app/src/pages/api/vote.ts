@@ -22,7 +22,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const signer = new Wallet(ethereumPrivateKey, provider)
     const contract = new Contract(contractAddress, Hackathon.abi, signer)
 
-    
+    console.log({vote, merkleTreeRoot, nullifierHash, proof})
+
     try {
         const transaction = await contract.castVote(vote, merkleTreeRoot, nullifierHash, proof)
         await transaction.wait()

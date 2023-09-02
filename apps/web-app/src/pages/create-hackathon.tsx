@@ -23,6 +23,8 @@ export default function CreateHackathon() {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
 
+    console.log({startTime, deadlineTime, endTime})
+
     switch (name) {
       case 'name':
         setName(value);

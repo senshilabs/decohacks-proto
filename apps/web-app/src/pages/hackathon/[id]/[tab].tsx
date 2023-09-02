@@ -18,10 +18,6 @@ const stats = [
   { label: 'Raised', value: '$25M' },
 ]
 
-// function classNames(...classes) {
-//   return classes.filter(Boolean).join(' ')
-// }
-
 const shortenAddress = (address: string) => `${address.slice(0, 6)}...${address.slice(-4)}`
 
 function HackathonTab() {
@@ -50,18 +46,31 @@ function HackathonTab() {
 
   const [voteList, setVoteList] = useState<string[]>([])
 
-  const [selectedId, setSelectedId] = useState<number>(0)
+  const [selectedAddress, setSelectedAddress] = useState<string>(0)
 
-  const fecthData = async () => {
+  const fetchData = async () => {
+    try{
     const fetchedParticipants = await getParticipants(contractAddress);
     const fetchedInfo = await hackathonInfo(contractAddress);
     const fetchedPrizes = await getPrizes(contractAddress);
     const fetchJudges = await getJudges(contractAddress);
 
+    const getVotes = async () => {
+      const promises = fetchedParticipants.map(participant => getVote(contractAddress)(participant));
+      const results = await Promise.all(promises);
+      setVoteList(results);
+    }
+    
     setParticipants(fetchedParticipants);
     setInfo(fetchedInfo);
     setPrizes(fetchedPrizes);
     setJudges(fetchJudges);
+    getVotes();
+
+    console.log({fetchedInfo})
+    }catch(e){
+      console.log(e)
+    }
   };
 
   const handleChange = (event) => {
@@ -75,21 +84,27 @@ function HackathonTab() {
   };
 
   useEffect(()=>{
-    const temp = async () => {
-      try{
-        setTimeout(async()=>{
-          const result = await getVote(contractAddress)(address)
-          console.log({result})
-        }, 1000)
-      
-      }catch(e){
-        console.log(e)
-      }
-      
+    if(voteList.length){
+      console.log({voteList})
     }
+  },[voteList])
+
+  // useEffect(()=>{
+  //   const temp = async () => {
+  //     try{
+  //       setTimeout(async()=>{
+  //         const result = await getVote(contractAddress)(address)
+  //         console.log({result})
+  //       }, 1000)
+      
+  //     }catch(e){
+  //       console.log(e)
+  //     }
+      
+  //   }
     
-    temp()
-  },[])
+  //   temp()
+  // },[])
 
   const createIdentity = async () => {
     const identity = new Identity()
@@ -99,7 +114,7 @@ function HackathonTab() {
     if(_identity) {
       try{
         addVoter(contractAddress)(_identity?.commitment.toString()).then((res)=>{
-          castVote(chain, contractAddress, _identity)(selectedId.toString())
+          castVote(chain, contractAddress, _identity)(selectedAddress)
         })
       }catch(e){
         console.log(e)
@@ -108,7 +123,7 @@ function HackathonTab() {
   }
 
   useEffect(()=>{
-    fecthData()
+    fetchData()
   },[deployedHacakthons])
 
   let content
@@ -156,7 +171,7 @@ function HackathonTab() {
                     </svg>
 
                     <p className="mt-6 text-2xl font-black leading-8 text-white">
-                      Ethcon Korea 2023
+                      {info[0]?.result[0]}
                     </p>
                     <blockquote className="mt-6 text-xl font-semibold leading-8 text-white">
                       <p>
@@ -365,7 +380,7 @@ function HackathonTab() {
               key={faker.internet.email()}
               className="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm cursor-pointer"
               onClick={()=>{
-                setSelectedId(i)
+                setSelectedAddress(participant)
                 createIdentity()
               }}
             >
@@ -392,7 +407,7 @@ function HackathonTab() {
                     alt=""
                   />
               </div>
-              <div>0</div> 
+              <div>{voteList[i]?.toString() || 0}</div> 
             </div>
             </div>
           )) : <div>no participants</div>}

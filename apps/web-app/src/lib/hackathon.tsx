@@ -3,7 +3,7 @@ import { Group } from "@semaphore-protocol/group"
 import { Identity } from "@semaphore-protocol/identity"
 import { generateProof } from "@semaphore-protocol/proof"
 import { readContract, readContracts, writeContract } from "@wagmi/core"
-import { BigNumber, ethers, utils } from "ethers"
+import { ethers } from "ethers"
 import { Chain, parseEther } from "viem"
 import hackathon from "../../contract-artifacts/Hackathon.json"
 
@@ -121,7 +121,8 @@ export const castVote = (chain:Chain, contractAddress: "0x${String}", _identity:
 
     const members = await semaphoreEthers.getGroupMembers(contractAddress)
     const group = new Group(contractAddress, 20, members)
-    const signal = BigNumber.from(utils.formatBytes32String(vote)).toString()
+    const signal = vote
+
     
     const { proof, merkleTreeRoot, nullifierHash } = await generateProof(
         _identity,
