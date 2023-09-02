@@ -1,6 +1,10 @@
 import { readContract, readContracts, writeContract } from "@wagmi/core"
-
-import { ethers } from "ethers"
+import { Group } from "@semaphore-protocol/group"
+import { Identity } from "@semaphore-protocol/identity"
+import { SemaphoreSubgraph } from "@semaphore-protocol/data"
+import { SemaphoreEthers } from "@semaphore-protocol/data"
+import { generateProof } from "@semaphore-protocol/proof"
+import { BigNumber, ethers, utils } from "ethers"
 import { parseEther } from "viem"
 import hackathon from "../../contract-artifacts/Hackathon.json"
 
@@ -92,3 +96,37 @@ export const addVoter = (contractAddress: "0x${String}") => (identityCommitment:
             args: [identityCommitment]
         }
     )
+
+
+export const castVote = (chainId:number, contractAddress: "0x${String}", _identity: Identity) => async (vote: string) => {
+
+    // 이거 chain 에 맞게 설정
+    const semaphoreEthers = new SemaphoreEthers("http://localhost:8545", {
+    address: "semaphore-address"
+    })
+
+    const members = await semaphoreEthers.getGroupMembers(contractAddress)
+    const group = new Group(contractAddress, 20, members)
+
+    const signal = BigNumber.from(utils.formatBytes32String(vote)).toString()
+
+    const { proof, merkleTreeRoot, nullifierHash } = await generateProof(
+        _identity,
+        group,
+        contractAddress,
+        signal
+    )
+
+    return fetch("api/vote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            chainId,
+            contractAddress,
+            vote,
+            merkleTreeRoot,
+            nullifierHash,
+            proof
+        })
+    })
+}
