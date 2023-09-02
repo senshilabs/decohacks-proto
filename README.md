@@ -49,3 +49,14 @@ DECOHACKS (Decentralization Of HACKathonS)
 
 ### Useful Links
 - [GitHub Repository](https://github.com/senshilabs/decohacks-proto)
+
+
+
+### Main Contract 
+
+| Item | Optimism | Linea |
+|------|----------|-------|
+| **RPC URL** | `https://goerli.optimism.io` | `https://rpc.goerli.linea.build` |
+| **Chain ID** | `420` | `59140` |
+| **HackathonFactory Address** | `0xEB34bb2aC2eb907f760Dfd6eEDE69cddDEB88E32` | `0x08e2d1cc528f44b48D0A50A30E11dcb227170771` |
+| **Semaphore Address** | `0x3889927F0B5Eb1a02C6E2C20b39a1Bd4EAd76131` (Official) | `0x31E4CA436707166315734Ed62f59a36Cc1132483` (Manually Deployed) |
