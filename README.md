@@ -39,7 +39,7 @@ DECOHACKS (Decentralization Of HACKathonS)
 - Linea: Contract is deployed and accessible through DAPP, but the hackathon creation transaction is still pending.
 - zkSync: Pre-work needed for Deploy was done, but Semaphore contracts used in DECOHACKS could not be deployed, thus the final deployment was not carried out.
 
-5. **Time-Based Rules**: Hackathons generally change states based on time. For example, voting should only be possible during the voting period. Due to the short nature of hackathons, some features were deliberately omitted for testing.
+5. **Hackathon Time**: Hackathons generally change states based on time. For example, voting should only be possible during the voting period. Due to the short nature of hackathons, some features were deliberately omitted for testing. and we use mock data for displying media
 
 ### Technologies Used
 - Blockchain: Ethereum
