@@ -13044,6 +13044,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"moment@npm:^2.29.4":
+  version: 2.29.4
+  resolution: "moment@npm:2.29.4"
+  checksum: 0ec3f9c2bcba38dc2451b1daed5daded747f17610b92427bebe1d08d48d8b7bdd8d9197500b072d14e326dd0ccf3e326b9e3d07c5895d3d49e39b6803b76e80e
+  languageName: node
+  linkType: hard
+
 "motion@npm:10.16.2":
   version: 10.16.2
   resolution: "motion@npm:10.16.2"
@@ -17560,6 +17567,7 @@ __metadata:
     dotenv: ^16.0.3
     ethers: ^5.7.2
     framer-motion: ^7.6.6
+    moment: ^2.29.4
     next: 13.0.1
     next-pwa: ^5.6.0
     next-themes: ^0.2.1

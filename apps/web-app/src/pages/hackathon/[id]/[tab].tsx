@@ -21,9 +21,7 @@ function HackathonTab() {
   const router = useRouter()
   const { id, tab } = router.query
 
-  const hackathonInfo = useMemo(() => {
-    return hackathonInfos.find((_, i) => i === Number(router.query.id))
-  }, [router])
+  const hackathonInfo = useMemo(() => hackathonInfos.find((_, i) => i === Number(router.query.id)), [router])
 
   let content
   switch (tab) {
@@ -143,7 +141,7 @@ function HackathonTab() {
                     href="#"
                     className="text-base font-semibold leading-7 text-indigo-600"
                   >
-                    Join to builder <span aria-hidden="true">&rarr;</span>
+                    Join Happy Hacking <span aria-hidden="true">&rarr;</span>
                   </a>
                 </div>
               </div>
