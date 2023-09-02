@@ -48,18 +48,15 @@ export default function Home() {
       },[chain])
 
     useEffect(()=>{
-        try{
-            console.log({targetHackathonFactory})
             const fectchHackathons = async () => {
-                const hackathonsResult = await hackathons(targetHackathonFactory)
-                setDeployedHackathons(hackathonsResult || [])
+                try{
+                    const hackathonsResult = await hackathons(targetHackathonFactory)
+                    setDeployedHackathons(hackathonsResult || [])
+                }catch(e){
+                    console.log(e)
+                }
             }
-    
             fectchHackathons()
-        }catch(e){
-            console.log(e)
-        }
-        
     },[targetHackathonFactory])
 
     useEffect(()=>{

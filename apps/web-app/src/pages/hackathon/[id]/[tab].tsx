@@ -229,7 +229,11 @@ function HackathonTab() {
                   <div
                     className="text-base font-semibold leading-7 text-indigo-600"
                     onClick={async()=>{
-                      await participate(contractAddress)
+                      try{
+                        await participate(contractAddress)
+                      }catch(e){
+                        console.log(e)
+                      }
                     }}
                   >
                     Join Happy Hacking <span aria-hidden="true">&rarr;</span>
@@ -268,7 +272,8 @@ function HackathonTab() {
                 type="button"
                 className="rounded bg-white px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                 onClick={async()=>{
-                  await depositEthPrize(contractAddress)(prizeName, ethValue)}}
+                  await depositEthPrize(contractAddress)(prizeName, ethValue)}
+                }
               >
                 Add Prize
               </button>
@@ -322,7 +327,7 @@ function HackathonTab() {
                   alt=""
                 />
                 <h3 className="mt-6 text-sm font-medium text-gray-900">
-                  {judge}
+                  {shortenAddress(judge)}
                 </h3>
                 <dl className="mt-1 flex flex-grow flex-col justify-between">
                   <dt className="sr-only">Title</dt>
@@ -391,7 +396,7 @@ function HackathonTab() {
                   alt=""
                 />
               </div>
-              <div className="min-w-0 flex-1 bg-red-50">
+              <div className="min-w-0 flex-1">
                   <span className="absolute inset-0" aria-hidden="true" />
                   <p className="text-sm font-medium text-gray-900">
                     {shortenAddress(participant)}

@@ -88,8 +88,12 @@ export default function CreateHackathon() {
   // },[name, startTime, endTime, website, telegram, twitter,judge])
 
   const submit = async () => {
-    const createHackathon = createMiniHackathon(targetHackathonFactory)
+    try{
+      const createHackathon = createMiniHackathon(targetHackathonFactory)
     createHackathon(name, startTimestamp, deadlineTimestamp, endTimestamp, website, telegram, twitter, [judge])  
+    }catch(e){
+      console.log(e)
+    }
   }
 
   return (
