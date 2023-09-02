@@ -105,6 +105,14 @@ export const addVoter = (contractAddress: "0x${String}") => (identityCommitment:
         }
     )
 
+export const distributePrize = (contractAddress: "0x${String}") => writeContract(
+        {
+            address: contractAddress,
+            abi: ABI,
+            functionName: "distributePrize",
+        }
+)
+
 
 export const castVote = (chain:Chain, contractAddress: "0x${String}", _identity: Identity) => async (vote: string) => {
     let semaphoreAddress;
