@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+import "./Certificate.sol";
 import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
 
 contract Hackathon {
@@ -26,6 +27,7 @@ contract Hackathon {
         address[] evaluators;
     }
 
+    Certificate public certificate;
     SemaphoreConfig public semaphoreConfig;
     HackathonInfo public hackathon;
     Prize[] public prizes;
@@ -37,6 +39,7 @@ contract Hackathon {
 
     constructor(
         address semaphoreAddress,
+        address certificateAddress,
         string memory _name, 
         uint256 _start,
         uint256 _submit_deadline, 
@@ -52,6 +55,7 @@ contract Hackathon {
 
         semaphoreConfig.semaphore = ISemaphore(semaphoreAddress);
         semaphoreConfig.groupId = uint256(uint160(address(this)));
+        certificate = Certificate(certificateAddress);
 
         hackathon.name = _name;
         hackathon.start = _start;
@@ -68,6 +72,7 @@ contract Hackathon {
     function participate() external {
         require(block.timestamp < hackathon.start, "Cannot participate after hackathon start");
         participants.push(msg.sender);
+        certificate.issueParticipateCertificate(msg.sender, uint256(uint160(address(this))));
         votes[msg.sender] = 0;
     }
 
@@ -161,6 +166,7 @@ contract Hackathon {
         for (uint256 i = 0; i < prizes.length; i++) {
             if (winners[i] != address(0)) {
                 payable(winners[i]).transfer(prizes[i].balance);
+                certificate.issueAwardCertificate(winners[i], uint256(uint160(address(this))));
             }
         }
         

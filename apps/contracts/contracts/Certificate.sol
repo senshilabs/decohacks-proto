@@ -14,9 +14,30 @@ contract Certificate is ERC1155, Ownable {
     mapping(address => uint256[]) public AwardCertificateOf;
     mapping(address => uint256[]) public ParticipateCertificateOf;
 
+    // issueable addresses
+    address[] public issuers;
+    
+    // issure 등록
+    function addIssuer(address issuer) public onlyOwner {
+        issuers.push(issuer);
+    }
+
+     modifier onlyIssuers() {
+        bool isIssuer = false;
+        uint256 length = issuers.length;
+        for (uint256 i = 0; i < length; i++) {
+            if (issuers[i] == msg.sender) {
+                isIssuer = true;
+            }
+        }
+        require(isIssuer, "only issuers");
+        _;
+    }
+
+
     constructor(string memory uri) ERC1155(uri) {}
 
-    function issueAwardCertificate(address account, uint256 hackathon) public onlyOwner returns (uint256) {
+    function issueAwardCertificate(address account, uint256 hackathon) public onlyIssuers {
         /// generate from hackathon with salt
         uint256 awardTokenId = hackathon+1;
         AwardCertificate[awardTokenId];
@@ -24,7 +45,7 @@ contract Certificate is ERC1155, Ownable {
         _mint(account, awardTokenId, 1, "");
     }
 
-    function issueParticipateCertificate(address account, uint256 hackathon) public onlyOwner returns (uint256) {
+    function issueParticipateCertificate(address account, uint256 hackathon) public onlyIssuers  {
         /// generate from hackathon
         uint256 participateTokenId = hackathon;
         ParticipateCertificate[participateTokenId];

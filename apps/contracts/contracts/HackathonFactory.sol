@@ -2,14 +2,17 @@
 pragma solidity ^0.8.4;
 
 import "./Hackathon.sol";
+import "./Certificate.sol";
 import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
 
 contract HackathonFactory {
     ISemaphore public semaphore;
     address[] public hackathons;
+    Certificate public certificate;
 
     constructor(address semaphoreAddress) {
         semaphore = ISemaphore(semaphoreAddress);
+        certificate = new Certificate("https://decohacks.com/api/certificate/{id}");
     }
 
     function createMiniHackathon(
@@ -24,6 +27,7 @@ contract HackathonFactory {
     ) public returns(address){
         Hackathon hackathon = new Hackathon(
             address(semaphore),
+            address(certificate),
             _name,
             _start,
             _submit_deadline,
@@ -37,6 +41,7 @@ contract HackathonFactory {
         
         semaphore.createGroup(uint256(uint160(hackathonAddress)), 20, hackathonAddress);
         hackathons.push(hackathonAddress);
+        certificate.addIssuer(hackathonAddress);
         return hackathonAddress;
     }
 
