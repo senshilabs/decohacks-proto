@@ -1,11 +1,12 @@
 import { faker } from '@faker-js/faker'
 import { EnvelopeIcon, PhoneIcon } from '@heroicons/react/20/solid'
+import { Identity } from '@semaphore-protocol/identity'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { formatEther } from 'viem'
 import { useContractRead } from 'wagmi'
 import hackathonABI from "../../../../contract-artifacts/Hackathon.json"
-import { depositEthPrize, getJudges, getParticipants, getPrizes, hackathonInfo, participate } from '../../../lib/hackathon'
+import { addVoter, depositEthPrize, getJudges, getParticipants, getPrizes, hackathonInfo, participate } from '../../../lib/hackathon'
 
 const SubTabs = ['info', 'prize', 'judge', 'participant']
 
@@ -19,6 +20,8 @@ const stats = [
 // function classNames(...classes) {
 //   return classes.filter(Boolean).join(' ')
 // }
+
+const shortenAddress = (address: string) => `${address.slice(0, 6)}...${address.slice(-4)}`
 
 function HackathonTab() {
   const router = useRouter()
@@ -37,6 +40,8 @@ function HackathonTab() {
 
   const [prizeName, setPrizeName] = useState('');
   const [ethValue, setEthValue] = useState('');
+
+  const [_identity, setIdentity] = useState<Identity>()
 
   const fecthData = async () => {
     const fetchedParticipants = await getParticipants(contractAddress);
@@ -60,15 +65,25 @@ function HackathonTab() {
     }
   };
 
+  const createIdentity = useCallback(async () => {
+    const identity = new Identity()
+
+    setIdentity(identity)
+
+    localStorage.setItem("identity", identity.toString())
+}, [])
+
+
+  useEffect(()=>{
+    if(_identity?.commitment) {
+      addVoter(contractAddress)(_identity?.commitment.toString())
+    }
+    
+  },[_identity])
+
   useEffect(()=>{
     fecthData()
   },[deployedHacakthons])
-
-  useEffect(()=>{
-    console.log({participants, judges, info, prizes})
-  },[participants, judges, info, prizes])
-
-
 
   let content
   switch (tab) {
@@ -196,7 +211,7 @@ function HackathonTab() {
                     type="text"
                     name="prizeName"
                     id="prizeName"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mr-4"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6 mr-4"
                     placeholder="Prize Name"
                     onChange={handleChange}
                   />
@@ -204,7 +219,7 @@ function HackathonTab() {
                     type="text"
                     name="ethValue"
                     id="ethValue"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mr-4"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6 mr-4"
                     placeholder="Eth Value"
                     onChange={handleChange}
                   />
@@ -324,9 +339,11 @@ function HackathonTab() {
       content = (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {participants.length ? participants.map((participant) => (
-            <div
+            <div>
+                <div
               key={faker.internet.email()}
-              className="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400"
+              className="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm cursor-pointer"
+              onClick={createIdentity}
             >
               <div className="flex-shrink-0">
                 <img
@@ -335,17 +352,24 @@ function HackathonTab() {
                   alt=""
                 />
               </div>
-              <div className="min-w-0 flex-1">
-                <a href="#" className="focus:outline-none">
+              <div className="min-w-0 flex-1 bg-red-50">
                   <span className="absolute inset-0" aria-hidden="true" />
                   <p className="text-sm font-medium text-gray-900">
-                    {participant}
+                    {shortenAddress(participant)}
                   </p>
                   <p className="truncate text-sm text-gray-500">
                     {faker.person.jobTitle()}
                   </p>
-                </a>
               </div>
+              <div className="" >
+                <img
+                    className="h-5 w-5"
+                    src={"https://static.thenounproject.com/png/5244038-200.png"}
+                    alt=""
+                  />
+              </div>
+              <div>0</div> 
+            </div>
             </div>
           )) : <div>no participants</div>}
         </div>

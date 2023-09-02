@@ -3,6 +3,7 @@ import { useAccount, useNetwork } from 'wagmi';
 import { HackathonFactoryAddress } from '../global/constants';
 import { createMiniHackathon } from '../lib/hackathonFactory';
 
+
 export default function CreateHackathon() {
   const [name, setName] = useState('')
   const [startTime, setStartTime] = useState({ date: '', time: '' });
