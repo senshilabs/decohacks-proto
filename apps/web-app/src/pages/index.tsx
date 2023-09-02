@@ -79,14 +79,7 @@ export default function Home() {
             <div className="mt-[16px] flex w-full">
                 <div className="grid w-full grid-cols-2 gap-4">
                     {realHackathonInfos?.reverse().map((hackathon, i) => (
-                        <div
-                            className="cursor-pointer"
-                            onClick={() => {
-                                router.push({
-                                    pathname: `/hackathon/${i}/info`
-                                })
-                            }}
-                        >
+                        <div>
                             <div className="rounded-lg bg-gray-50 shadow-sm ring-1 ring-gray-900/5">
                                 <dl className="flex flex-wrap">
                                     <div className="flex-auto pl-6 pt-6">
@@ -184,9 +177,13 @@ export default function Home() {
                                     </div>
                                 </dl>
                                 <div className="mt-6 border-t border-gray-900/5 px-6 py-6">
-                                    <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
+                                    <div className="cursor-pointer text-sm font-semibold leading-6 text-gray-900" onClick={()=>{
+                                        router.push({
+                                            pathname: `/hackathon/${deployedHacakthons[i]}/info`
+                                        })
+                                    }}>
                                         Join Happy Hacking <span aria-hidden="true">&rarr;</span>
-                                    </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>

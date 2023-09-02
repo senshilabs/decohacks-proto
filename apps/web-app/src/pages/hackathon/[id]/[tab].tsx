@@ -1,8 +1,10 @@
 import { faker } from '@faker-js/faker'
 import { EnvelopeIcon, PhoneIcon } from '@heroicons/react/20/solid'
 import { useRouter } from 'next/router'
-import { useMemo } from 'react'
-import { hackathonInfos } from '../../../global/constants'
+import { useEffect, useState } from 'react'
+import { useContractRead } from 'wagmi'
+import hackathonABI from "../../../../contract-artifacts/Hackathon.json"
+import { getParticipants, getPrizes, hackathonInfo, participate } from '../../../lib/hackathon'
 
 const SubTabs = ['info', 'prize', 'judge', 'participant']
 
@@ -19,28 +21,45 @@ const stats = [
 
 function HackathonTab() {
   const router = useRouter()
-  const { id, tab } = router.query
+  const { id:contractAddress, tab } = router.query
 
-  const hackathonInfo = useMemo(() => hackathonInfos.find((_, i) => i === Number(router.query.id)), [router])
+  const { data: deployedHacakthons } = useContractRead({
+    address: contractAddress,
+    abi: hackathonABI.abi,
+    functionName: "hackathon"
+  })
+
+  const [participants, setParticipants] = useState<string[]>([]);
+  const [info, setInfo] = useState<any[]>([]);
+  const [prizes, setPrizes] = useState<any[]>([]);
+
+
+  // const hackathonInfo = useMemo(() => hackathonInfos.find((_, i) => i === Number(router.query.id)), [router])
+
+  const fecthData = async () => {
+    const fetchedParticipants = await getParticipants(contractAddress);
+    const fetchedInfo = await hackathonInfo(contractAddress);
+    const fetchedPrizes = await getPrizes(contractAddress);
+
+    setParticipants(fetchedParticipants);
+    setInfo(fetchedInfo);
+    setPrizes(fetchedPrizes)
+  };
+
+  useEffect(()=>{
+    fecthData()
+  },[deployedHacakthons])
+
+  useEffect(()=>{
+    console.log(participants, info, prizes)
+  },[participants, info,prizes])
+
+
 
   let content
   switch (tab) {
     case 'info':
       content = (
-        // <div>
-        //   <h2>{hackathonInfo?.name}</h2>
-        //   <div id="duration">
-        //     duration
-        //     <p>{hackathonInfo?.duration?.startDate.toDateString()}</p>
-        //     <p>{hackathonInfo?.duration?.endDate.toDateString()}</p>
-        //   </div>
-        //   <div id="link">
-        //     link
-        //     <p>{hackathonInfo?.links?.website}</p>
-        //     <p>{hackathonInfo?.links?.github}</p>
-        //     <p>{hackathonInfo?.links?.twitter}</p>
-        //   </div>
-        // </div>
         <div className="bg-white">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-16 sm:gap-y-24 lg:mx-0 lg:max-w-none lg:grid-cols-2">
@@ -137,12 +156,14 @@ function HackathonTab() {
                   ))}
                 </dl>
                 <div className="mt-10 flex">
-                  <a
-                    href="#"
+                  <div
                     className="text-base font-semibold leading-7 text-indigo-600"
+                    onClick={async()=>{
+                      await participate(contractAddress)
+                    }}
                   >
                     Join Happy Hacking <span aria-hidden="true">&rarr;</span>
-                  </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -156,7 +177,7 @@ function HackathonTab() {
           role="list"
           className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8"
         >
-          {hackathonInfo?.prizes?.map((prize, i) => (
+          {prizes?.map((prize, i) => (
             <li
               key={i}
               className="overflow-hidden rounded-xl border border-gray-200 bg-white"
@@ -251,7 +272,7 @@ function HackathonTab() {
     case 'judge':
       content = (
         // <div id="judge">
-        //   {hackathonInfo?.judgeList.map((judge, i) => (
+        //   {info?.judgeList.map((judge, i) => (
         //     <p>{judge}</p>
         //   ))}
         // </div>
@@ -259,7 +280,7 @@ function HackathonTab() {
           role="list"
           className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
         >
-          {hackathonInfo?.judgeList.map((judge) => (
+          {info?.judgeList.map((judge) => (
             <li
               key={faker.internet.email()}
               className="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center shadow"
@@ -323,7 +344,7 @@ function HackathonTab() {
     case 'participant':
       content = (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {hackathonInfo?.participantList.map((participant) => (
+          {participants.map((participant) => (
             <div
               key={faker.internet.email()}
               className="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400"
@@ -361,6 +382,7 @@ function HackathonTab() {
         <div className="grid w-fit grid-cols-4 divide-x-[1px] divide-gray-200 rounded-md border-[1px] border-gray-200 text-center shadow-sm">
           {SubTabs.map((subtab, i) => (
             <div
+              key={i}
               className="flex h-[36px] w-[100px] items-center justify-center hover:bg-slate-200"
               onClick={() =>
                 router.push(`/hackathon/${router.query.id}/${subtab}`)

@@ -1,79 +1,89 @@
-import { useState } from 'react'
+import { useState } from 'react';
+import { useAccount } from 'wagmi';
+import { createMiniHackathon } from '../lib/hackathonFactory';
 
 export default function CreateHackathon() {
   const [name, setName] = useState('')
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
+  const [startTime, setStartTime] = useState({ date: '', time: '' });
+  const [deadlineTime, setDeadlineTime] = useState({ date: '', time: '' });
+  const [endTime, setEndTime] = useState({ date: '', time: '' });
   const [website, setWebsite] = useState('')
-  const [github, setGithub] = useState('')
+  const [telegram, settelegram] = useState('')
   const [twitter, setTwitter] = useState('')
+  const [judge, setJudge] = useState('')
 
-  const submit = () => {
-    console.log(submit)
+  const { connector: activeConnector, isConnected } = useAccount()
+
+  // const submit = () => {
+  //   console.log(submit)
+  // }
+
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+
+    console.log({name, value})
+
+    switch (name) {
+      case 'name':
+        setName(value);
+        break;
+      case 'website':
+        setWebsite(value);
+        break;
+      case 'telegram':
+        settelegram(value);
+        break;
+      case 'twitter':
+        setTwitter(value);
+        break;
+      case 'judge':
+        setJudge(value);
+        break;
+      case 'start-date':
+        setStartTime((prev) => ({ ...prev, date: value }));
+        break;
+      case 'start-time':
+        setStartTime((prev) => ({ ...prev, time: value }));
+        break;
+      case 'deadline-date':
+        setDeadlineTime((prev) => ({ ...prev, date: value }));
+        break;
+      case 'deadline-time':
+        setDeadlineTime((prev) => ({ ...prev, time: value }));
+        break;
+      case 'end-date':
+        setEndTime((prev) => ({ ...prev, date: value }));
+        break;
+      case 'end-time':
+        setEndTime((prev) => ({ ...prev, time: value }));
+        break;
+      default:
+        break;
+    }
+  };
+
+  const getUnixTimestamp = ({ date, time }) => {
+    if (!date || !time) return null; // Make sure both date and time are available
+    return new Date(`${date}T${time}:00`).getTime() / 1000;
+  };
+
+  const startTimestamp = getUnixTimestamp(startTime);
+  const deadlineTimestamp = getUnixTimestamp(deadlineTime);
+  const endTimestamp = getUnixTimestamp(endTime);
+
+  // useEffect(() => {
+  //   console.log({name, startTime, endTime, website, telegram, twitter,judge})
+  // },[name, startTime, endTime, website, telegram, twitter,judge])
+
+  const submit = async () => {
+    console.log({name, startTimestamp, deadlineTimestamp, deadlineTimestamp, website, telegram, twitter,judge})
+    const createHackathon = createMiniHackathon("0x508a631cEC4F2ecD570D66031De93ad986dCF389")
+    createHackathon(name, startTimestamp, deadlineTimestamp, endTimestamp, website, telegram, twitter, [judge])  
   }
 
   return (
     <div className="mt-[16px]">
-      {/* <form>
-        <div>
-          <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="startDate">Start Date:</label>
-          <input
-            type="date"
-            id="startDate"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="endDate">End Date:</label>
-          <input
-            type="date"
-            id="endDate"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="website">Website:</label>
-          <input
-            type="url"
-            id="website"
-            value={website}
-            onChange={(e) => setWebsite(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="github">GitHub:</label>
-          <input
-            type="url"
-            id="github"
-            value={github}
-            onChange={(e) => setGithub(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="twitter">Twitter:</label>
-          <input
-            type="url"
-            id="twitter"
-            value={twitter}
-            onChange={(e) => setTwitter(e.target.value)}
-          />
-        </div>
-
-        <div id="submit" onClick={submit}>
-          submit
-        </div>
-      </form> */}
       <form>
         <div className="space-y-12">
           <div className="border-b border-gray-900/10 pb-12">
@@ -85,7 +95,7 @@ export default function CreateHackathon() {
               share.
             </p>
 
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+            <div className="">
               <div className="sm:col-span-4">
                 <label
                   htmlFor="name"
@@ -95,11 +105,12 @@ export default function CreateHackathon() {
                 </label>
                 <div className="mt-2">
                   <input
+                    onChange={handleInputChange}
                     type="text"
                     name="name"
                     id="name"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    placeholder="John Doe"
+                    placeholder="Ethcon Seoul 2023"
                   />
                 </div>
               </div>
@@ -109,13 +120,21 @@ export default function CreateHackathon() {
                   htmlFor="start-date"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  Start Date
+                  Start
                 </label>
-                <div className="mt-2">
+                <div className="mt-2 flex w-full gap-4">
                   <input
+                  onChange={handleInputChange}
                     type="date"
                     name="start-date"
                     id="start-date"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                   <input
+                   onChange={handleInputChange}
+                    type="time"
+                    name="start-time"
+                    id="start-time"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
                 </div>
@@ -123,16 +142,49 @@ export default function CreateHackathon() {
 
               <div className="sm:col-span-3">
                 <label
-                  htmlFor="end-date"
+                  htmlFor="Deadline"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  End Date
+                  Deadline
                 </label>
-                <div className="mt-2">
+                <div className="mt-2 flex w-full gap-4">
                   <input
+                  onChange={handleInputChange}
+                    type="date"
+                    name="deadline-date"
+                    id="deadline-date"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                   <input
+                   onChange={handleInputChange}
+                    type="time"
+                    name="deadline-time"
+                    id="deadline-time"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+
+              <div className="sm:col-span-3">
+                <label
+                  htmlFor="End"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  End
+                </label>
+                <div className="mt-2 flex w-full gap-4">
+                  <input
+                  onChange={handleInputChange}
                     type="date"
                     name="end-date"
                     id="end-date"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                   <input
+                   onChange={handleInputChange}
+                    type="time"
+                    name="end-time"
+                    id="end-time"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
                 </div>
@@ -146,13 +198,9 @@ export default function CreateHackathon() {
                   Website
                 </label>
                 <div className="mt-2 flex rounded-md shadow-sm">
-                  <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm">
-                    {/* <GlobeIcon
-                      className="h-5 w-5 text-gray-400"
-                      aria-hidden="true"
-                    /> */}
-                  </span>
+                  
                   <input
+                  onChange={handleInputChange}
                     type="url"
                     name="website"
                     id="website"
@@ -164,24 +212,20 @@ export default function CreateHackathon() {
 
               <div className="sm:col-span-4">
                 <label
-                  htmlFor="github"
+                  htmlFor="telegram"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  GitHub
+                  telegram
                 </label>
                 <div className="mt-2 flex rounded-md shadow-sm">
-                  <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm">
-                    {/* <GitHubIcon
-                      className="h-5 w-5 text-gray-400"
-                      aria-hidden="true"
-                    /> */}
-                  </span>
+               
                   <input
+                  onChange={handleInputChange}
                     type="url"
-                    name="github"
-                    id="github"
+                    name="telegram"
+                    id="telegram"
                     className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                    placeholder="https://github.com/username"
+                    placeholder="https://telegram.com/username"
                   />
                 </div>
               </div>
@@ -194,13 +238,9 @@ export default function CreateHackathon() {
                   Twitter
                 </label>
                 <div className="mt-2 flex rounded-md shadow-sm">
-                  <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm">
-                    {/* <TwitterIcon
-                      className="h-5 w-5 text-gray-400"
-                      aria-hidden="true"
-                    /> */}
-                  </span>
+               
                   <input
+                    onChange={handleInputChange}
                     type="url"
                     name="twitter"
                     id="twitter"
@@ -209,10 +249,31 @@ export default function CreateHackathon() {
                   />
                 </div>
               </div>
+
+              <div className="sm:col-span-4">
+                <label
+                  htmlFor="judge"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  judge
+                </label>
+                <div className="mt-2 flex rounded-md shadow-sm">
+               
+                  <input
+                    onChange={handleInputChange}
+                    type="url"
+                    name="judge"
+                    id="judge"
+                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                    placeholder="0x123...456"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </form>
+      <div onClick={submit}>Submit</div>
     </div>
   )
 }

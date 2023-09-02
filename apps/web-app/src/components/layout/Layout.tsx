@@ -5,8 +5,7 @@ interface LayoutProps {
     children: ReactNode
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
-    return (
+const Layout: React.FC<LayoutProps> = ({ children }) => (
         <div className="flex h-fit min-h-[100vh] w-full justify-center px-[44px] ">
             <div className="flex w-[1176px] max-w-[1176px] flex-col items-center">
                 <Header />
@@ -17,6 +16,5 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             {/* <Footer /> */}
         </div>
     )
-}
 
 export default Layout
