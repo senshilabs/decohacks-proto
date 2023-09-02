@@ -4,11 +4,11 @@ import { readContracts } from "@wagmi/core"
 import { ethers } from "ethers"
 import router from "next/router"
 import { useEffect, useState } from "react"
-import { useContractRead, useNetwork } from "wagmi"
+import { useNetwork } from "wagmi"
 import hackathonABI from "../../contract-artifacts/Hackathon.json"
-import hackathonFactoryABI from "../../contract-artifacts/HackathonFactory.json"
 import { HackathonFactoryAddress } from "../global/constants"
 import { unixTimeStringToDateString } from "../global/util/util"
+import { hackathons } from "../lib/hackathonFactory"
 
 export const getCurrentStatus = (realHackathonInfo: any[]): string => {
     const now = Date.now() / 1000; 
@@ -31,13 +31,37 @@ export const getCurrentStatus = (realHackathonInfo: any[]): string => {
 
 export default function Home() {
     const { chain, chains } = useNetwork()
-    const { data: deployedHacakthons } = useContractRead({
-        address: HackathonFactoryAddress.optimism,
-        abi: hackathonFactoryABI.abi,
-        functionName: "getDeployedHackathons"
-    })
 
     const [realHackathonInfos, setRealHackathonInfos] = useState<string[]>([])
+
+    const [targetHackathonFactory, setTargetHackathonFactory] = useState()
+
+    const [deployedHacakthons, setDeployedHackathons] = useState<string[]>([]);
+
+    useEffect(()=>{
+        if(chain.id === 420) {
+          setTargetHackathonFactory(HackathonFactoryAddress.optimism)
+        }
+        if(chain.id === 59140){
+          setTargetHackathonFactory(HackathonFactoryAddress.linea)
+        }
+        
+      },[chain])
+
+    useEffect(()=>{
+        try{
+            console.log({targetHackathonFactory})
+            const fectchHackathons = async () => {
+                const hackathonsResult = await hackathons(targetHackathonFactory)
+                setDeployedHackathons(hackathonsResult || [])
+            }
+    
+            fectchHackathons()
+        }catch(e){
+            console.log(e)
+        }
+        
+    },[targetHackathonFactory])
 
     useEffect(()=>{
         setRealHackathonInfos([])

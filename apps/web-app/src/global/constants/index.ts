@@ -118,5 +118,5 @@ export const hackathonInfos: Hackathon[] = [
 
 export const HackathonFactoryAddress = {
     "optimism":"0xdef88dBF467A98c1Ea1AA87b22B2Bc9e98d1a79C",
-    "linea":"0xff9a39379F660AFC563e3749aCaadCbf76F3fC32",
+    "linea":"0x4D43ba912eDb1b2525731ad4BA66Fd2231Ef48f0",
 }

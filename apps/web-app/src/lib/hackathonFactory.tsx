@@ -16,6 +16,6 @@ export const hackathons = (contractAddress: '0x${String}') => readContract(
     {
       address: contractAddress,
       abi: ABI,
-      functionName: "hackathons"
+      functionName: "getDeployedHackathons"
     }
   )

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useEffect, useState } from 'react';
+import { useAccount, useNetwork } from 'wagmi';
 import { HackathonFactoryAddress } from '../global/constants';
 import { createMiniHackathon } from '../lib/hackathonFactory';
 
@@ -12,6 +12,10 @@ export default function CreateHackathon() {
   const [telegram, settelegram] = useState('')
   const [twitter, setTwitter] = useState('')
   const [judge, setJudge] = useState('')
+
+  const { chain, chains } = useNetwork()
+
+  const [targetHackathonFactory, setTargetHackathonFactory] = useState(HackathonFactoryAddress.optimism)
 
   const { connector: activeConnector, isConnected } = useAccount()
 
@@ -66,12 +70,22 @@ export default function CreateHackathon() {
   const deadlineTimestamp = getUnixTimestamp(deadlineTime);
   const endTimestamp = getUnixTimestamp(endTime);
 
+
+  useEffect(()=>{
+    if(chain.id === 420) {
+      setTargetHackathonFactory(HackathonFactoryAddress.optimism)
+    }
+    if(chain.id === 59140){
+      setTargetHackathonFactory(HackathonFactoryAddress.linea)
+    }
+    
+  },[chain])
   // useEffect(() => {
   //   console.log({name, startTime, endTime, website, telegram, twitter,judge})
   // },[name, startTime, endTime, website, telegram, twitter,judge])
 
   const submit = async () => {
-    const createHackathon = createMiniHackathon(HackathonFactoryAddress.optimism)
+    const createHackathon = createMiniHackathon(targetHackathonFactory)
     createHackathon(name, startTimestamp, deadlineTimestamp, endTimestamp, website, telegram, twitter, [judge])  
   }
 
