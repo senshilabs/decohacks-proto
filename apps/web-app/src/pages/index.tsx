@@ -1,106 +1,160 @@
-import { Box, Button, Divider, Heading, HStack, Link, ListItem, OrderedList, Text } from "@chakra-ui/react"
-import { Identity } from "@semaphore-protocol/identity"
-import { useRouter } from "next/router"
-import { useCallback, useContext, useEffect, useState } from "react"
-import Stepper from "../components/Stepper"
-import LogsContext from "../context/LogsContext"
-import IconAddCircleFill from "../icons/IconAddCircleFill"
-import IconRefreshLine from "../icons/IconRefreshLine"
+import { faker } from "@faker-js/faker"
+import { CalendarDaysIcon, CreditCardIcon } from "@heroicons/react/20/solid"
+import router from "next/router"
+import { hackathonInfos } from "../global/constants"
 
-export default function IdentitiesPage() {
-    const router = useRouter()
-    const { setLogs } = useContext(LogsContext)
-    const [_identity, setIdentity] = useState<Identity>()
-
-    useEffect(() => {
-        const identityString = localStorage.getItem("identity")
-
-        if (identityString) {
-            const identity = new Identity(identityString)
-
-            setIdentity(identity)
-
-            setLogs("Your Semaphore identity was retrieved from the browser cache 👌🏽")
-        } else {
-            setLogs("Create your Semaphore identity 👆🏽")
-        }
-    }, [])
-
-    const createIdentity = useCallback(async () => {
-        const identity = new Identity()
-
-        setIdentity(identity)
-
-        localStorage.setItem("identity", identity.toString())
-
-        setLogs("Your new Semaphore identity was just created 🎉")
-    }, [])
-
+export default function Home() {
     return (
-        <>
-            <Heading as="h2" size="xl">
-                Identities
-            </Heading>
+        <div className="w-full">
+            <div className="mt-[16px] flex w-full">
+                <div className="grid w-full grid-cols-2 gap-4">
+                    {hackathonInfos?.map((hackathon, i) => (
+                        <div
+                            className="cursor-pointer"
+                            onClick={() => {
+                                router.push({
+                                    pathname: `/hackathon/${i}/info`
+                                })
+                            }}
+                        >
+                            <h2 className="sr-only">Summary</h2>
+                            <div className="rounded-lg bg-gray-50 shadow-sm ring-1 ring-gray-900/5">
+                                <dl className="flex flex-wrap">
+                                    <div className="flex-auto pl-6 pt-6">
+                                        <dt className="text-xl font-semibold leading-6 text-gray-900">
+                                            {hackathon.name}
+                                        </dt>
+                                    </div>
+                                    <div className="flex-none self-end px-6 pt-4">
+                                        <dt className="sr-only">Status</dt>
+                                        <dd className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20">
+                                            Register
+                                        </dd>
 
-            <Text pt="2" fontSize="md">
-                Users interact with the protocol using a Semaphore{" "}
-                <Link href="https://semaphore.pse.dev/docs/guides/identities" color="primary.500" isExternal>
-                    identity
-                </Link>{" "}
-                (similar to Ethereum accounts). It contains three values:
-            </Text>
-            <OrderedList pl="20px" pt="5px" spacing="3">
-                <ListItem>Trapdoor: private, known only by user</ListItem>
-                <ListItem>Nullifier: private, known only by user</ListItem>
-                <ListItem>Commitment: public</ListItem>
-            </OrderedList>
+                                        <dd className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                                            In Progress
+                                        </dd>
+                                        <dd className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-600/20">
+                                            Voting
+                                        </dd>
+                                        <dd className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-700 ring-1 ring-inset ring-gray-600/20">
+                                            Finished
+                                        </dd>
+                                    </div>
+                                    <div className="relative mt-6 flex w-full flex-none border-t border-gray-900/5 px-6 pt-6">
+                                        <img className="h-10 w-10 rounded-full" src={faker.image.url()} />
+                                        <img className="-ml-4 h-10 w-10 rounded-full" src={faker.image.url()} />
+                                        <img className="-ml-4 h-10 w-10 rounded-full" src={faker.image.url()} />
+                                        <span className="ml-30 absolute left-24 mt-3 rounded bg-gray-900 px-2 py-1 text-white">
+                                            +123
+                                        </span>
+                                    </div>
 
-            <Divider pt="5" borderColor="gray.500" />
+                                    <div className="mt-4 flex w-full flex-none gap-x-4 px-6">
+                                        <dt className="flex-none">
+                                            <span className="sr-only">Due date</span>
+                                            <CalendarDaysIcon className="h-6 w-5 text-gray-400" aria-hidden="true" />
+                                        </dt>
+                                        <dd className="text-sm leading-6 text-gray-500">
+                                            Block Height : 1111111 ~ 222222
+                                        </dd>
+                                    </div>
+                                    <div className="mt-4 flex w-full flex-none gap-x-4 px-6">
+                                        <dt className="flex-none">
+                                            <span className="sr-only">Status</span>
+                                            <CreditCardIcon className="h-6 w-5 text-gray-400" aria-hidden="true" />
+                                        </dt>
+                                        <dd className="text-sm leading-6 text-gray-500">Prize Pool : $10,560.00</dd>
+                                    </div>
+                                </dl>
+                                <div className="mt-6 border-t border-gray-900/5 px-6 py-6">
+                                    <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
+                                        Join Happy Hacking <span aria-hidden="true">&rarr;</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        // <div
+                        //   className="flex h-[272px] flex-col justify-between border-2 border-[#] bg-blue-200 font-bold"
+                        //   key={i}
+                        //   onClick={() => {
+                        //     router.push({
+                        //       pathname: `/hackathon/${i}/info`,
+                        //     })
+                        //   }}
+                        // >
+                        //   <div className="flex justify-between bg-blue-500">
+                        //     <div id="name" className="text-[24px]">
+                        //       {hackathon.name}
+                        //     </div>
+                        //     <div id="link">
+                        //       <a
+                        //         href={hackathon?.links?.website}
+                        //         target="_blank"
+                        //         rel="noopener noreferrer"
+                        //       >
+                        //         <img
+                        //           className="inline-block h-10 w-10 rounded-full"
+                        //           src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                        //           alt="Profile"
+                        //         />
+                        //       </a>
+                        //       <a
+                        //         href={hackathon?.links?.github}
+                        //         target="_blank"
+                        //         rel="noopener noreferrer"
+                        //       >
+                        //         <img
+                        //           className="inline-block h-10 w-10 rounded-full"
+                        //           src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
+                        //           alt="Profile"
+                        //         />
+                        //       </a>
 
-            <HStack pt="5" justify="space-between">
-                <Text fontWeight="bold" fontSize="lg">
-                    Identity
-                </Text>
-                {_identity && (
-                    <Button leftIcon={<IconRefreshLine />} variant="link" color="text.700" onClick={createIdentity}>
-                        New
-                    </Button>
-                )}
-            </HStack>
-
-            {_identity ? (
-                <Box py="6" whiteSpace="nowrap">
-                    <Box p="5" borderWidth={1} borderColor="gray.500" borderRadius="4px">
-                        <Text textOverflow="ellipsis" overflow="hidden">
-                            Trapdoor: {_identity.trapdoor.toString()}
-                        </Text>
-                        <Text textOverflow="ellipsis" overflow="hidden">
-                            Nullifier: {_identity.nullifier.toString()}
-                        </Text>
-                        <Text textOverflow="ellipsis" overflow="hidden">
-                            Commitment: {_identity.commitment.toString()}
-                        </Text>
-                    </Box>
-                </Box>
-            ) : (
-                <Box py="6">
-                    <Button
-                        w="100%"
-                        fontWeight="bold"
-                        justifyContent="left"
-                        colorScheme="primary"
-                        px="4"
-                        onClick={createIdentity}
-                        leftIcon={<IconAddCircleFill />}
-                    >
-                        Create identity
-                    </Button>
-                </Box>
-            )}
-
-            <Divider pt="3" borderColor="gray" />
-
-            <Stepper step={1} onNextClick={_identity && (() => router.push("/groups"))} />
-        </>
+                        //       <a
+                        //         href={hackathon?.links?.twitter}
+                        //         target="_blank"
+                        //         rel="noopener noreferrer"
+                        //       >
+                        //         <img
+                        //           className="inline-block h-10 w-10 rounded-full"
+                        //           src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/twitter/twitter-original.svg"
+                        //           alt="Profile"
+                        //         />
+                        //       </a>
+                        //     </div>
+                        //   </div>
+                        //   <div>시작일시(타임스탬프) 종료일시(타임스탬프)</div>
+                        //   <div>참여자</div>
+                        //   <div className="flex justify-between bg-blue-500">
+                        //     <div>상태 (참가자 받는중 / 진행중 /end)</div>
+                        //     <button className="rounded-lg bg-[#3770FF] px-[44px] py-[11px] text-[#fff]">
+                        //       Apply
+                        //     </button>
+                        //   </div>
+                        // </div>
+                    ))}
+                    <div id="add-hackathon">
+                        <div className="rounded-lg bg-gray-50 shadow-sm ring-1 ring-gray-900/5">
+                            <dl className="flex flex-wrap">
+                                <div className="flex-auto pl-6 pt-6">
+                                    <dt className="text-xl font-semibold leading-6 text-gray-900">New Hackathon</dt>
+                                </div>
+                            </dl>
+                            <div
+                                className="mt-6 cursor-pointer border-t border-gray-900/5 px-6 py-6"
+                                onClick={() => {
+                                    router.push({ pathname: "create-hackathon" })
+                                }}
+                            >
+                                <div className="text-sm font-semibold leading-6 text-gray-900">
+                                    Click to add <span aria-hidden="true">&rarr;</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     )
 }
