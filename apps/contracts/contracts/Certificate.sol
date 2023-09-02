@@ -14,12 +14,13 @@ contract Certificate is ERC1155, Ownable {
     mapping(address => uint256[]) public AwardCertificateOf;
     mapping(address => uint256[]) public ParticipateCertificateOf;
 
+    address public hackathonFactory;
     // issueable addresses
     address[] public issuers;
     
-    // issure 등록
-    function addIssuer(address issuer) public onlyOwner {
-        issuers.push(issuer);
+    modifier onlyHackathonFactory() {
+        require(msg.sender == hackathonFactory, "only hackathon factory");
+        _;
     }
 
      modifier onlyIssuers() {
@@ -35,7 +36,15 @@ contract Certificate is ERC1155, Ownable {
     }
 
 
-    constructor(string memory uri) ERC1155(uri) {}
+    // issure 등록
+    function addIssuer(address issuer) public onlyHackathonFactory {
+        issuers.push(issuer);
+    }
+
+
+    constructor(string memory uri, address _hackathonFactory) ERC1155(uri) {
+        hackathonFactory = _hackathonFactory;
+    }
 
     function issueAwardCertificate(address account, uint256 hackathon) public onlyIssuers {
         /// generate from hackathon with salt

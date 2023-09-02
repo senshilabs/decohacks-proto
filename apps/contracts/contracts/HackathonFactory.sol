@@ -12,7 +12,7 @@ contract HackathonFactory {
 
     constructor(address semaphoreAddress) {
         semaphore = ISemaphore(semaphoreAddress);
-        certificate = new Certificate("https://decohacks.com/api/certificate/{id}");
+        certificate = new Certificate("https://decohacks.com/api/certificate/{id}", address(this));
     }
 
     function createMiniHackathon(
