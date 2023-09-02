@@ -80,6 +80,10 @@ contract Hackathon {
         return participants;
     }
 
+    function getEvaluators() external view returns (address[] memory) {
+        return hackathon.evaluators;
+    }
+
     function depositEthPrize(string memory prizeName) external payable {
         require(block.timestamp < hackathon.submit_deadline, "Cannot deposit prize after submit deadline");
 
