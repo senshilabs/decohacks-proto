@@ -99,7 +99,8 @@ contract Hackathon {
     }
 
     function addVoter(uint256 identityCommitment) external {
-        require(block.timestamp < hackathon.submit_deadline, "Cannot join group after submit deadline");
+        require(hackathon.submit_deadline < block.timestamp, "Cannot add voter before submit deadline");
+        require(block.timestamp < hackathon.end, "Cannot join group after hackathon end");
         // evaluator 만 참여 가능
         bool isEvaluator = false;
         for (uint256 i = 0; i < hackathon.evaluators.length; i++) {
@@ -110,6 +111,8 @@ contract Hackathon {
         }
         require(isEvaluator, "Only evaluators can join group");
         
+        // voter 등록은 한번만 가능하나, Dev 를 미적용하여 여러번 등록 가능
+
         semaphoreConfig.semaphore.addMember(semaphoreConfig.groupId, identityCommitment);
     }
 
@@ -119,8 +122,8 @@ contract Hackathon {
         uint256 nullifierHash,
         uint256[8] calldata proof
     ) external {
-        require(block.timestamp < hackathon.end, "Cannot cast vote after hackathon end");
-        require(nullifierHashes[nullifierHash] == false, "Cannot vote twice");
+        require(hackathon.submit_deadline < block.timestamp, "Cannot add voter before submit deadline");
+        require(block.timestamp < hackathon.end, "Cannot join group after hackathon end");
         semaphoreConfig.semaphore.verifyProof(semaphoreConfig.groupId, merkleTreeRoot, voted, nullifierHash, semaphoreConfig.groupId, proof);
 
         nullifierHashes[nullifierHash] = true;
