@@ -78,8 +78,6 @@ function HackathonTab() {
             setPrizes(fetchedPrizes)
             setJudges(fetchJudges)
             getVotes()
-
-            console.log({ fetchedInfo })
         } catch (e) {
             console.log(e)
         }
@@ -94,29 +92,6 @@ function HackathonTab() {
             setEthValue(value)
         }
     }
-
-    useEffect(() => {
-        if (voteList.length) {
-            console.log({ voteList })
-        }
-    }, [voteList])
-
-    // useEffect(()=>{
-    //   const temp = async () => {
-    //     try{
-    //       setTimeout(async()=>{
-    //         const result = await getVote(contractAddress)(address)
-    //         console.log({result})
-    //       }, 1000)
-
-    //     }catch(e){
-    //       console.log(e)
-    //     }
-
-    //   }
-
-    //   temp()
-    // },[])
 
     const createIdentity = async () => {
         const identity = new Identity()
@@ -231,11 +206,9 @@ function HackathonTab() {
                                 </dl>
                                 <div className="mt-10 flex">
                                     <div
-                                        className="text-base font-semibold leading-7 text-indigo-600"
+                                        className="cursor-pointer text-base font-semibold leading-7 text-indigo-600"
                                         onClick={async () => {
                                             try {
-                                                console.log({ blockNumber })
-                                                console.log({ contractAddress })
                                                 await participate(contractAddress)
                                             } catch (e) {
                                                 console.log(e)
@@ -417,7 +390,7 @@ function HackathonTab() {
                     {SubTabs.map((subtab, i) => (
                         <div
                             key={i}
-                            className="flex h-[36px] w-[100px] items-center justify-center hover:bg-slate-200"
+                            className="flex h-[36px] w-[100px] cursor-pointer items-center justify-center hover:bg-slate-200"
                             onClick={() => router.push(`/hackathon/${router.query.id}/${subtab}`)}
                         >
                             {subtab}

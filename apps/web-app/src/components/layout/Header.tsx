@@ -118,6 +118,7 @@ const Header = () => {
     return (
         <div className="flex h-[75px] w-full items-center justify-between border-b border-gray-200 py-[16px]">
             <p
+                className="cursor-pointer"
                 onClick={() => {
                     router.push({ pathname: "/" })
                 }}

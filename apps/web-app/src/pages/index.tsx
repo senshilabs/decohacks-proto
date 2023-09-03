@@ -11,22 +11,23 @@ import { unixTimeStringToDateString } from "../global/util/util"
 import { hackathons } from "../lib/hackathonFactory"
 
 export const getCurrentStatus = (realHackathonInfo: any[]): string => {
-    const now = Date.now() / 1000; 
+    const now = Date.now() / 1000
 
     const startTime = realHackathonInfo[0]?.result[1].toString()
     const submissionDeadline = realHackathonInfo[0]?.result[2].toString()
     const endTime = realHackathonInfo[0]?.result[3].toString()
 
     if (now < startTime) {
-        return "Register";
-    } if (now >= startTime && now < submissionDeadline) {
-        return "In progress";
-    } if (now >= submissionDeadline && now < endTime) {
-        return "Voting";
-    } 
-        return "Final";
+        return "Register"
+    }
+    if (now >= startTime && now < submissionDeadline) {
+        return "In progress"
+    }
+    if (now >= submissionDeadline && now < endTime) {
+        return "Voting"
+    }
+    return "Final"
 }
-
 
 export default function Home() {
     const { chain, chains } = useNetwork()
@@ -35,35 +36,35 @@ export default function Home() {
 
     const [targetHackathonFactory, setTargetHackathonFactory] = useState()
 
-    const [deployedHacakthons, setDeployedHackathons] = useState<string[]>([]);
+    const [deployedHacakthons, setDeployedHackathons] = useState<string[]>([])
 
-    useEffect(()=>{
-        if(chain){
-            if(chain.id === 420) {
+    useEffect(() => {
+        if (chain) {
+            if (chain.id === 420) {
                 setTargetHackathonFactory(HackathonFactoryAddress.optimism)
-              }
-              if(chain.id === 59140){
-                setTargetHackathonFactory(HackathonFactoryAddress.linea)
-              }      
-        }
-      },[chain])
-
-    useEffect(()=>{
-            const fectchHackathons = async () => {
-                try{
-                    const hackathonsResult = await hackathons(targetHackathonFactory)
-                    setDeployedHackathons(hackathonsResult || [])
-                }catch(e){
-                    console.log(e)
-                }
             }
-            fectchHackathons()
-    },[targetHackathonFactory])
+            if (chain.id === 59140) {
+                setTargetHackathonFactory(HackathonFactoryAddress.linea)
+            }
+        }
+    }, [chain])
 
-    useEffect(()=>{
+    useEffect(() => {
+        const fectchHackathons = async () => {
+            try {
+                const hackathonsResult = await hackathons(targetHackathonFactory)
+                setDeployedHackathons(hackathonsResult || [])
+            } catch (e) {
+                console.log(e)
+            }
+        }
+        fectchHackathons()
+    }, [targetHackathonFactory])
+
+    useEffect(() => {
         setRealHackathonInfos([])
-    },[chain])
-    
+    }, [chain])
+
     useEffect(() => {
         if (Array.isArray(deployedHacakthons)) {
             const fetchInfos = async () => {
@@ -100,7 +101,7 @@ export default function Home() {
         <div className="w-full">
             <div className="mt-[16px] flex w-full">
                 <div className="grid w-full grid-cols-2 gap-4">
-                    {realHackathonInfos?.reverse().map((hackathon, i) => (
+                    {realHackathonInfos?.map((hackathon, i) => (
                         <div key={i}>
                             <div className="rounded-lg bg-gray-50 shadow-sm ring-1 ring-gray-900/5">
                                 <dl className="flex flex-wrap">
@@ -117,25 +118,23 @@ export default function Home() {
 
                                     <div className="flex-none self-end px-6 pt-4">
                                         <dt className="sr-only">Status</dt>
-                                        {
-                                            getCurrentStatus(hackathon) === "Register" ? (
-                                                <dd className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20">
-                                                    Register
-                                                </dd>
-                                            ) : getCurrentStatus(hackathon) === "In progress" ? (
-                                                <dd className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                                                    In Progress
-                                                </dd>
-                                            ) : getCurrentStatus(hackathon) === "Voting" ? (
-                                                <dd className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-600/20">
-                                                    Voting
-                                                </dd>
-                                            ) : (
-                                                <dd className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-700 ring-1 ring-inset ring-gray-600/20">
-                                                    Finished
-                                                </dd>
-                                            )
-                                        }
+                                        {getCurrentStatus(hackathon) === "Register" ? (
+                                            <dd className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20">
+                                                Register
+                                            </dd>
+                                        ) : getCurrentStatus(hackathon) === "In progress" ? (
+                                            <dd className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                                                In Progress
+                                            </dd>
+                                        ) : getCurrentStatus(hackathon) === "Voting" ? (
+                                            <dd className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-600/20">
+                                                Voting
+                                            </dd>
+                                        ) : (
+                                            <dd className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-700 ring-1 ring-inset ring-gray-600/20">
+                                                Finished
+                                            </dd>
+                                        )}
                                         {/* <dd className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20">
                                             Register
                                         </dd>
@@ -169,9 +168,7 @@ export default function Home() {
                                             )}`}
                                         </dd>
                                         <dd className="text-sm leading-6 text-gray-500">
-                                            {`End : ${unixTimeStringToDateString(
-                                                hackathon[0]?.result[3].toString()
-                                            )}`}
+                                            {`End : ${unixTimeStringToDateString(hackathon[0]?.result[3].toString())}`}
                                         </dd>
                                     </div>
 
@@ -192,18 +189,19 @@ export default function Home() {
                                             <CreditCardIcon className="h-6 w-5 text-gray-400" aria-hidden="true" />
                                         </dt>
                                         <dd className="text-sm leading-6 text-gray-500">
-                                            {`Prize Pool : ${ethers.utils.formatEther(
-                                                hackathon[1]?.result
-                                            )} ETH`}
+                                            {`Prize Pool : ${ethers.utils.formatEther(hackathon[1]?.result)} ETH`}
                                         </dd>
                                     </div>
                                 </dl>
                                 <div className="mt-6 border-t border-gray-900/5 px-6 py-6">
-                                    <div className="cursor-pointer text-sm font-semibold leading-6 text-gray-900" onClick={()=>{
-                                        router.push({
-                                            pathname: `/hackathon/${deployedHacakthons[i]}/info`
-                                        })
-                                    }}>
+                                    <div
+                                        className="cursor-pointer text-sm font-semibold leading-6 text-gray-900"
+                                        onClick={() => {
+                                            router.push({
+                                                pathname: `/hackathon/${deployedHacakthons[i]}/info`
+                                            })
+                                        }}
+                                    >
                                         Join Happy Hacking <span aria-hidden="true">&rarr;</span>
                                     </div>
                                 </div>
